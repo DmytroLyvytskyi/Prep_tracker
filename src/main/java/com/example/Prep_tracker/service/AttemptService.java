@@ -12,6 +12,7 @@ import com.example.Prep_tracker.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -76,5 +77,13 @@ public class AttemptService {
         }
 
         return (int) Math.ceil(previousIntervalDays * multiplier);
+    }
+
+    public List<AttemptResponse> getDueForReview(Long userId) {
+        return attemptRepository
+                .findByUserIdAndNextReviewDateLessThanEqual(userId, LocalDate.now())
+                .stream()
+                .map(AttemptMapper::toResponse)
+                .toList();
     }
 }
