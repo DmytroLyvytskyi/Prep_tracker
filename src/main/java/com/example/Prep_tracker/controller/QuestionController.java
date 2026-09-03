@@ -37,8 +37,11 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(questionService.getQuestionById(id));
+    public ResponseEntity<QuestionResponse> getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal
+    ) {
+        return ResponseEntity.ok(questionService.getQuestionById(id, principal.userId()));
     }
 
     @GetMapping("/my")
@@ -49,8 +52,11 @@ public class QuestionController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<QuestionResponse>> getByCategory(@PathVariable Category category) {
-        return ResponseEntity.ok(questionService.getByCategory(category));
+    public ResponseEntity<List<QuestionResponse>> getByCategory(
+            @PathVariable Category category,
+            @AuthenticationPrincipal AuthenticatedUser principal
+    ) {
+        return ResponseEntity.ok(questionService.getByCategory(category, principal.userId()));
     }
 
     @PutMapping("/{id}")

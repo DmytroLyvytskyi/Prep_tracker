@@ -55,8 +55,8 @@ class AttemptServiceTest {
 
         question = mock(Question.class);
         lenient().when(question.getId()).thenReturn(QUESTION_ID);
+        lenient().when(question.getCreatedBy()).thenReturn(user);
     }
-
 
     private void stubSaveToPersist() {
         when(attemptRepository.save(any(Attempt.class))).thenAnswer(invocation -> {
@@ -170,4 +170,21 @@ class AttemptServiceTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void recordAttempt_throwsWhenQuestionBelongsToAnotherUser() {
+        User anotherUser = mock(User.class);
+        when(anotherUser.getId()).thenReturn(999L);
+        when(question.getCreatedBy()).thenReturn(anotherUser);
+
+        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+
+        AttemptRequest request = new AttemptRequest(QUESTION_ID, ConfidenceLevel.GOOD);
+
+        assertThrows(SecurityException.class,
+                () -> attemptService.recordAttempt(request, user));
+
+        verify(attemptRepository, never()).save(any());
+    }
+
 }

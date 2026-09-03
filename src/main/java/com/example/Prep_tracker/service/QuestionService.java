@@ -26,9 +26,14 @@ public class QuestionService {
         return QuestionMapper.toResponse(saved);
     }
 
-    public QuestionResponse getQuestionById(Long id) {
+    public QuestionResponse getQuestionById(Long id, Long userId) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
+
+        if (!question.getCreatedBy().getId().equals(userId)) {
+            throw new SecurityException("You can only view your own questions");
+        }
+
         return QuestionMapper.toResponse(question);
     }
 
@@ -39,8 +44,8 @@ public class QuestionService {
                 .toList();
     }
 
-    public List<QuestionResponse> getByCategory(Category category) {
-        return questionRepository.findByCategory(category)
+    public List<QuestionResponse> getByCategory(Category category, Long userId) {
+        return questionRepository.findByCreatedByIdAndCategory(userId, category)
                 .stream()
                 .map(QuestionMapper::toResponse)
                 .toList();

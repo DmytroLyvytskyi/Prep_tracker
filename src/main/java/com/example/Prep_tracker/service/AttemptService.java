@@ -32,6 +32,10 @@ public class AttemptService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Question not found: " + request.questionId()));
 
+        if (!question.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You can only record attempts on your own questions");
+        }
+
         Optional<Attempt> lastAttempt = attemptRepository
                 .findTopByUserIdAndQuestionIdOrderByAttemptedAtDesc(
                         currentUser.getId(), question.getId());
